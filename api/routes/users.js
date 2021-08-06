@@ -1,4 +1,4 @@
-const User = require('../modals/User')
+const User = require('../models/User')
 const router = require('express').Router()
 const bcrypt = require('bcrypt')
 
@@ -38,15 +38,39 @@ router.delete('/:id', async (req, res) => {
     }
 })
 //get a user
-router.get("/:id", async (req, res) => {
+router.get("/", async (req, res) => {
+    const userId = req.query.userId
+    const username = req.query.username
     try {
-        const user = await User.findById(req.params.id)
+        const user = userId
+            ? await User.findById(userId)
+            :  await User.findOne({username: username})
         const {password, undateAt, ...other} = user._doc
         res.status(200).json(other)
     } catch (error) {
         res.status(500).json(error)
     }
 })
+
+//get friends
+    router.get("/friends/:userId", async(req, res) => {
+        try {
+            const user = await User.findById(req.params.userId)
+            const friends = await Promise.all(
+                user.followings.map((friendId) => {
+                    return User.findById(friendId)
+                })
+            )
+            let friendList = [];
+            friends.map((friend) => {
+                const {_id, username, profilePicture} = friend;
+                friendList.push({_id, username, profilePicture})
+            })
+            res.status(200).json(friendList)
+        } catch (error) {
+            res.status(500).json(error)
+        }
+    })
 
 //follow a user
 
@@ -66,7 +90,7 @@ router.put("/:id/follow", async (req,res) => {
             res.status(500).json(err)
         }
     } else {
-
+        res.status(403).json("you cant follow yourself");
     }
 })
 // unfollow user
@@ -86,7 +110,7 @@ router.put("/:id/unfollow", async (req,res) => {
             res.status(500).json(err)
         }
     } else {
-
+        res.status(403).json("you cant unfollow yourself");
     }
 })
 

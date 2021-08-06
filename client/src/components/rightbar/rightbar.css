@@ -91,3 +91,22 @@
 .rightbarTitle {
   margin-bottom: 10px;
 }
+
+.rightbarFollowButton {
+  margin-top: 30px;
+  margin-bottom: 10px;
+  border: none;
+  background-color: black;
+  color: white;
+  border-radius: 5px;
+  padding: 5px 10px;
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.rightbarFollowButton:focus {
+  outline: none;
+}

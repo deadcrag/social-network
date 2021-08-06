@@ -1,7 +1,20 @@
-import React from 'react'
+import React, { useContext, useRef } from 'react'
 import './login.css'
+import { loginCall } from '../../apiCalls';
+import { AuthContext } from '../../context/AuthContext';
+import { CircularProgress } from '@material-ui/core';
 
 export default function Login() {
+    const email = useRef();
+    const password = useRef();
+    const {user, isFetching, dispatch} = useContext(AuthContext);
+
+    const handleClick = (e) => {
+        e.preventDefault()
+        loginCall({email: email.current.value ,password: password.current.value}, dispatch)
+    }
+
+    console.log(user)
     return (
         <div className='login'>
             <div className="loginWrapper">
@@ -12,13 +25,28 @@ export default function Login() {
                     </span>
                 </div>    
                 <div className="loginRight">
-                    <div className="loginBox">
-                        <input type="Email"  placeholder="Email" className="loginInput" />    
-                        <input type="Password"  placeholder="Password" className="loginInput" />    
-                        <button className="loginButton">Log In</button>
+                    <form className="loginBox" onSubmit={handleClick}>
+                        <input 
+                            type="email" 
+                            placeholder="Email" 
+                            className="loginInput" 
+                            ref={email} 
+                            required
+                        />    
+                        <input 
+                            type="Password"  
+                            placeholder="Password"
+                            minLength="5"
+                            className="loginInput" 
+                            ref={password} 
+                            required
+                        />    
+                        <button className="loginButton" type="submit" disabled={isFetching}>
+                            {isFetching ? <CircularProgress style={{'color':'white'}} size="25px"/> : "Log in"}
+                        </button>
                         <span className="loginForgot">Forgot Password?</span>
                         <button className="loginRegisterButton">Create a new account</button>
-                    </div>    
+                    </form>    
                 </div>    
             </div>            
         </div>
